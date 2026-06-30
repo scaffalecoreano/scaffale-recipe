@@ -340,20 +340,19 @@ async function generateRecipe() {
   saveBtn.classList.remove('saved');
   saveBtn.textContent = '☆ Salva ricetta';
 
+  // ATTENZIONE: questo endpoint va sostituito con il proxy (Cloudflare Worker)
+  // per evitare di esporre la API key nel browser. Vedi nota di Claude.
+  const PROXY_ENDPOINT = 'https://scaffale-recipe-proxy.scaffalecoreano.workers.dev';
+
   const SYSTEM = `Sei l'assistente culinario di Scaffale Coreano (scaffalecoreano.it), magazine editoriale italiano sulla cucina e cultura coreana, gestito dalla coppia italo-coreana Francesca e Kyeong-uk.
 Suggerisci UNA ricetta coreana realizzabile con gli ingredienti forniti. Tono caldo, autentico, editoriale.
 Rispondi ESCLUSIVAMENTE in JSON valido, senza markdown, senza backtick, senza testo aggiuntivo.
 {"titolo":"Nome in italiano","hangul":"Nome in coreano hangul (romanizzazione)","tempo":"es. 25 minuti","porzioni":"es. 2 porzioni","ingredienti":"Lista con quantità, un ingrediente per riga","procedimento":"Passi numerati 1. 2. 3., uno per riga, max 6 passi","nota_culturale":"1-2 frasi sul contesto culturale","kyeong_uk_dice":"Una frase breve e autentica come la direbbe Kyeong-uk a un italiano"}`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(PROXY_ENDPOINT, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': 'INSERISCI_QUI_LA_TUA_API_KEY',
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-calls': 'true'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1000,
